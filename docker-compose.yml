@@ -1,0 +1,91 @@
+version: "3.9"
+services:
+  app:
+    platform: linux/x86_64
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+    volumes:
+      - .:/opt/app/api
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    container_name: api-product
+  db:
+    platform: linux/x86_64
+    image: postgres:14
+    container_name: postgres14-presence
+    restart: always
+    environment:
+      POSTGRES_DATABASE: 'general_db_id'
+      POSTGRES_USER: '7aoidev'
+      POSTGRES_PASSWORD: 'p@55w0rd123'
+      POSTGRES_ROOT_PASSWORD: 'ind0nes1aTung4l1k4@#'
+      TZ: Asia/Jakarta
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+      replicas: 1
+      update_config:
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+  pgadmin:
+    platform: linux/x86_64
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: arkan.rka@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: p@55w0rd123
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1024M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+      replicas: 1
+      update_config:
+        order: start-first
+        failure_action: rollback
+        delay: 10s
+      rollback_config:
+        order: stop-first
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+networks:
+  presence_network: {}
+
+volumes:
+  data:
