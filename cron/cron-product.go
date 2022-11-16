@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -63,6 +64,8 @@ func (service *NewCronProductService) getProductMaster() <-chan dto.MProduct {
 			chanOut <- dto.MProduct{
 				ProCode:            value.ProCode,
 				Sku:                value.Sku,
+				ProName:            strconv.Quote(value.ProName),
+				ProName2:           strconv.Quote(value.ProName2),
 				GenerikName:        value.GenerikName,
 				Kategori:           value.Kategori,
 				Etalase:            value.Etalase,
@@ -71,6 +74,7 @@ func (service *NewCronProductService) getProductMaster() <-chan dto.MProduct {
 				FotoSamping:        value.FotoSamping,
 				FotoAtas:           value.FotoAtas,
 				FotoDetail:         value.FotoDetail,
+				Deskripsi:          value.Deskripsi,
 				LinkVideo:          value.LinkVideo,
 				Custom:             value.Custom,
 				SellUnit:           value.SellUnit,
@@ -84,11 +88,6 @@ func (service *NewCronProductService) getProductMaster() <-chan dto.MProduct {
 				HargaMax:           value.HargaMax,
 				HargaPdn:           value.HargaMin,
 				HargaIndoApotek:    value.HargaIndoApotek,
-				Wajib:              value.Wajib,
-				ApotekOnline:       value.ApotekOnline,
-				IndoApotek:         value.IndoApotek,
-				Green:              value.Green,
-				UserId:             value.UserId,
 			}
 		}
 		close(chanOut)
@@ -192,7 +191,9 @@ func (service *NewCronProductService) CronProduct() {
 		insertBulk1 := service.insertProductMaster(resultOfProduct)
 		insertBulk2 := service.insertProductMaster(resultOfProduct)
 		insertBulk3 := service.insertProductMaster(resultOfProduct)
-		bulkInsertChannel := service.mergeChanInsertBulk(insertBulk1, insertBulk2, insertBulk3)
+		insertBulk4 := service.insertProductMaster(resultOfProduct)
+		insertBulk5 := service.insertProductMaster(resultOfProduct)
+		bulkInsertChannel := service.mergeChanInsertBulk(insertBulk1, insertBulk2, insertBulk3, insertBulk4, insertBulk5)
 
 		// print output
 		counterTotal := 0

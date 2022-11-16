@@ -3,17 +3,16 @@ package main
 import (
 	"fmt"
 	"github.com/jrarkaan/go-cronjob/app/database"
-	"github.com/jrarkaan/go-cronjob/cron"
 	"time"
 )
 
 func main() {
 	db, _ := database.Connect()
 	//_ := config.Init()
-	// migration table on database
+	// migration table on database raka raka
 	database.Migrate(db)
 	// run cron
-	cron.InitCroService(db).CronProduct()
+	//cron.InitCroService(db).CronProduct()
 }
 
 func SendAutomail(automailType string) {
