@@ -1,0 +1,1 @@
+docker compose run --rm app go mod init github.com/jrarkaan/go-cronjob

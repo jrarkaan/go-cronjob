@@ -2,35 +2,18 @@ package main
 
 import (
 	"fmt"
-	cron "github.com/robfig/cron/v3"
-	"os"
-	"os/signal"
-	"syscall"
+	"github.com/jrarkaan/go-cronjob/app/database"
+	"github.com/jrarkaan/go-cronjob/cron"
 	"time"
 )
 
 func main() {
-	// set scheduler berdasarkan zona waktu sesuai kebutuhan
-	jakartaTime, _ := time.LoadLocation("Asia/Jakarta")
-	scheduler := cron.New(cron.WithLocation(jakartaTime))
-
-	// stop scheduler tepat sebelum fungsi berakhir
-	defer scheduler.Stop()
-
-	// set task yang akan dijalankan scheduler
-	// gunakan crontab string untuk mengatur jadwal
-	scheduler.AddFunc("*/1 * * * *", func() { SendAutomail("New Year") })
-	scheduler.AddFunc("0 07 10 * *", SendMonthlyBillingAutomail)
-	scheduler.AddFunc("0 09 * * 1-5", NotifyDailyAgenda)
-	scheduler.AddFunc("*/10 * * * *", NotifyNewOrder)
-
-	// start scheduler
-	go scheduler.Start()
-
-	// trap SIGINT untuk trigger shutdown.
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-	<-sig
+	db, _ := database.Connect()
+	//_ := config.Init()
+	// migration table on database
+	database.Migrate(db)
+	// run cron
+	cron.InitCroService(db).CronProduct()
 }
 
 func SendAutomail(automailType string) {
